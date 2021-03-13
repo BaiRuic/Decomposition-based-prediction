@@ -1,19 +1,12 @@
 import pandas as pd
-import numpy as np
 import torch
 import torch.nn as nn
-import math
-import matplotlib.pyplot as plt
-import os
 import random
 from sklearn import preprocessing
 
-import sys
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-import my_logging
+from . import my_logging
 
-
-path = os.path.abspath(os.path.dirname(os.getcwd()))   # 是上一级目录
+# 定义全局变量 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 torch.set_default_tensor_type('torch.DoubleTensor')
 
@@ -60,7 +53,7 @@ def standardizeData(X, SS=None, train = False):
 # 加载数据及数据预处理
 def prepare_data(time_steps=7, horizion=3, features=2):
     mylog.info_logger('prepare data')
-    data = pd.read_csv(path + '\\data\\energy.csv',header=0,index_col=0)
+    data = pd.read_csv('data\\energy.csv',header=0,index_col=0)
     reframed_data = data_to_supervised(data=data, time_steps=time_steps, horizion=horizion, features = 2)
     
     mylog.info_logger("standardize data")
@@ -142,6 +135,4 @@ if __name__ == '__main__':
     mylog.info_logger(f'train_ip 前两个样本{train_ip[0:3]}')
     mylog.info_logger(f'input_main:{input_main.shape}')
     mylog.info_logger(f'input_main:{input_main.reshape(input_main.shape[0], input_main.shape[1],1)[0:3]}')
-    
-
     

@@ -1,10 +1,12 @@
 import logging
+import os
 
 class My_Logging:
     '''
     配置日志信息
     '''
-    def __init__(self, logname='../log.log'):
+    path = os.path.abspath(os.path.dirname(os.path.dirname(__file__))) # 上一级目录
+    def __init__(self, logname="log.log"):
 
         logging.basicConfig(filename=logname, 
                         filemode='a',
@@ -18,3 +20,7 @@ class My_Logging:
         logging.info(log_text)
     def error_logger(self, log_text):
         logging.error(log_text)
+
+if __name__ == "__main__":
+    my_log = My_Logging()
+    my_log.info_logger('this is a logging')

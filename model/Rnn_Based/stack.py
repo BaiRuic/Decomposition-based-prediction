@@ -1,15 +1,14 @@
 import torch
 import torch.nn as nn
-import sys
-sys.path.append("..")
 
 from utils.my_logging import My_Logging as My_Logging
-from typing import List
 
+from typing import List
 Vector = List[int]
 
 # 定义日志配置实例
 my_log = My_Logging()
+DEVICE = torch.device('cuda' if torch.cuda.is_available() else "cpu")
 
 class LstmEncoder(nn.Module):
     def __init__(self, input_size:int, hidden_size:int):
@@ -165,12 +164,12 @@ class My_Sequential(nn.Sequential):
         my_log.info_logger(f"stack.output_forecast:{forecast.shape, input_estimate.shape}")
         return forecast, input_estimate
 
-class stack(nn.Module):
+class Stack(nn.Module):
     def __init__(self, input_size:int=2, 
                         hidden_size_list:Vector=[4,5,6,7,8], 
                         input_seqlen:int=14, 
                         forecast_seqlen:int=3):
-        super(stack,self).__init__()
+        super(Stack,self).__init__()
         
         self.estimate_seqlen = input_seqlen
         self.forecast_seqlen = forecast_seqlen
@@ -208,13 +207,13 @@ class stack(nn.Module):
         params:
             inputs : 整个stack的输入 [batch_size, seq_len, feature=2]
         returns:
-            forecast : 所有basicblock的预测输出之和
-            input_estimate: 模型最后的输出，也就是输入 减  最佳估计
+            forecast : 所有basicblock的预测输出之和  [batch_size, predict_seqlen, 1]
+            input_estimate: 模型最后的输出，也就是输入 减  最佳估计 [batch_size, input_seqlen, 1]
         '''
         
         # forcast value ，之后的每一个block输出的预测值都加进来
         batch_size = inputs.shape[0]
-        forecast = torch.zeros(size=(batch_size, self.forecast_seqlen, 1))
+        forecast = torch.zeros(size=(batch_size, self.forecast_seqlen, 1)).to(DEVICE)
         my_log.info_logger(f"stack.intputs: {inputs.shape}")
         my_log.info_logger(f"stack.output_forecast: {forecast.shape}")
         
@@ -239,18 +238,17 @@ class stack(nn.Module):
         return forecast, inputs
 
 
-
-
 if __name__ == '__main__':
     
     batch_size = 128
     seq_len = 14
     forecast_seqlen = 3
     features = 2
-    x = torch.rand(size=(batch_size, seq_len, features))
-    # model = BasicBlock(input_size=features, hidden_size=6, estimate_seqlen=seq_len, forecast_seqlen=forecast_seqlen)
-    model = stack(input_size=features, hidden_size_list=[6,5], input_seqlen=seq_len, forecast_seqlen=forecast_seqlen)
+    x = torch.rand(size=(batch_size, seq_len, features)).to(DEVICE)
+
+    model = Stack(input_size=features, hidden_size_list=[6,5], input_seqlen=seq_len, forecast_seqlen=forecast_seqlen).to(DEVICE)
     forecast, input_estimate = model(x)
+    my_log.info_logger(f"forecast:{forecast.shape}")
     
     
 
