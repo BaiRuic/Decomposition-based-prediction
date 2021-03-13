@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 # 定义超参数
 HyperParams = {"batch_size":128,
-                "N_EPOCHS":50,
+                "N_EPOCHS":100,
                 'lr':1e-3,
                 "time_steps":14,
                 "features":2,
@@ -238,7 +238,7 @@ class Train():
 
 def main():
     # 是否加载模型
-    load_model = True
+    load_model = False
 
     # 模型 优化器 损失函数
     model = stack.Stack(input_size=HyperParams['features'], 
@@ -257,6 +257,7 @@ def main():
     T = Train(hyperparams=HyperParams, model=model, optimizer=optimizer, loss_func=loss_func)
     if load_model:
         T.load_state()  # 加载之前训练好的模型
+        # T.train_model() # 再训练一次
     else:
         T.train_model() # 再训练一次
     T.plot_loss()
