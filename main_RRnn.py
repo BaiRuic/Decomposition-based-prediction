@@ -4,7 +4,7 @@ import numpy as np
 import random
 from utils.my_logging import My_Logging as My_Logging
 import utils.prepare_data as prepare_data
-from model.Rnn_Based import stack
+from model.RRnn_Based import stack
 from alive_progress import alive_bar
 import matplotlib.pyplot as plt
 
